@@ -1,0 +1,131 @@
+Desafio 3 -  Aprendizado de Máquinas
+
+Aluno: Michel de Farias Albuquerque
+
+Objetivo:
+O objetivo do desafio era, a partir de uma base de dados contendo
+30 características de medições de tecidos de tumores de câncer de 
+mama, produzir um modelo que possa fazer previsões se um tumor é 
+beligno ou maligno.
+
+Passo 1:
+Após a importação da base de dados e dos pacotes que foram utilizados,
+o primeiro passo foi colocar na variável do tipo fator "diagnosis" a categoria Beligno
+como positiva. 
+
+Passo 2:
+Divisão do banco de dados em dados de treino e teste, utilizando 75% dos dados para
+treino e 25% para teste.
+
+Passo 3: 
+Com o auxílio da função missmap do pacote Amelia, foi verificado na amostra 
+de treino a presença dados faltantes, a partir de um gráfico, em todas as variáveis
+preditoras.
+
+Haviam 353 observações, então caso houvesse alguma variável com uma quantidade
+de NAs por volta de 160, ela seria eliminada do banco de dados.
+Isso porque com uma quantidade grande de NAs fica inviável fazer até
+uma simulação desses valores pois afetaria o resultado final negativamente, sendo
+o ideal então a exclusão da variável do banco de dados.
+
+Após o teste, verificou-se que não haviam variáveis com uma quantidade muito de NAs, 
+não sendo necessária excluir nenhuma delas. Também foi observado que a quantidade de
+NAs não era tão pequena e que todas as observações continham dados faltantes em algumas,
+variáveis, impossibilitando então a exclusão de observações como solução para resolver
+o problema.
+
+Foi escolhido então aplicar um tratamento dos dados faltantes utilizando a função impute
+do pacote mlr, que faria a substituição dos NAs por novos valores. Sendo todas as variáveis do
+tipo numérico, então aplicou-se o método "regr.gbm" (Gradient Boosting - Regressão) para
+gerar um modelo que substitui-se os NAs pelos valores mais adequados possíveis.
+
+Obs: o mesmo modelo obtido através dos dados de treino e utilizado para realizar o 
+tratamento dos dados faltantes na base de treino foi utilizado para tratar NAs 
+na base de teste.
+
+
+Passo 4:
+Como as variáveis estão em diferentes escalas, foi necessário realizar uma padronização.
+Novamente foi criado um modelo, produzido a partir dos dados de treino, para colocar
+as variáveis dos dados de treino em uma mesma escala.
+
+Após padronizar os dados de treino, o mesmo modelo foi utilizado para realizar a 
+a padronização dos dados de teste.	 
+
+
+Passo 5:
+Foi aplicado o teste da variância para verificar se alguma das variáveis possuia baixa
+variância, sendo então tal variável ruim para modelo final. 
+Verificou-se que nenhuma variável apresentou problema.
+
+Passo 6:
+Foi aplicado o teste de correlação entre as variáveis preditoras afim de verificar
+a presença de multicolinearidade. Neste caso, em caso positivo, as variáveis que tem 
+alto grau de correlação contribuiríam com informações semelhantes ao modelo, sendo
+isso ruim para a previsão.
+
+Foi constatada a presença de variáveis com alto grau de correlação (maior que 0.75 no
+teste aplicado), e então 19 foram excluídas tanto dos dados de treino quanto dos dados 
+de teste.
+
+
+Passo 6:
+Foi aplicado um novo teste para verificar a presença de dependência
+linear entre as variáveis restantes, porém o resultado foi negativo.
+
+
+As variáveis preditoras então utilizadas para estimar o modelo foram:
+1-texture_mean          
+2- area_mean             
+3- symmetry_mean         
+4- fractal_dimension_mean
+5- texture_se            
+6- smoothness_se         
+7- concavepoints_se      
+8- symmetry_se           
+9- fractal_dimension_se  
+10- smoothness_worst      
+11- symmetry_worst  
+
+
+
+Passo 7:
+Foi verificada a proporção de observações na amostra de treino do tipo Beligno e
+do tipo Maligno para ver se seria necessário um rebalanceamento dos dados.
+A proporção obtida foi de 62,6% de Belignos e 37.4% de Malignos.
+
+Então decidiu-se por não fazer o rebalanceamento, por considerar que uma 
+proporção de observações proxima de 60/40 seja aceitável.
+
+Obs: por considerar que a categoria Maligno seja a mais importante na previsão, 
+por identificar as pessoas com tumores cancerígenos, foram testados modelos 
+fazendo o rebalanceamento. Os modelos foram criados a partir de dados com 
+proporções semelhantes entre as categorias (utilizando upscaling, downscaling
+e o método do pacote ROSE), porém nenhum deles gerou um modelo com resultados
+melhores do que o obtido sem o rebalanceamento.
+
+
+Passo 8:
+
+O modelo (Gradiente Boosting para classificação) foi criado então com as
+11 variáveis preditoras utilizando a função train, aplicando o método de reamostragem
+k-fold repetido (5 folds e 3 repetições) além do ajuste dos hiperparâmetros.
+
+Os hiperparâmetros utilizados foram: ntrees = número de arvores no modelo
+                                     interaction.depth = profundidade máxima de cada árvore
+                                     n.minobsinnode = num mínimo de indivíduos em um terminal
+                                     shrinkage = taxa de aprendizado
+
+
+Passo 9:
+Resultados =  Acurácia: 0.9397
+              Sensibilidade: 0.9726
+              Especificidade: 0.8837
+
+
+
+
+
+Obs: foram aplicados depois testes para verificar quais eram as variáveis 
+mais importantes para o modelo, e testadas novas combinações entre as variáveis
+preditoras. Porém nenhum dos modelos gerados obtiveram melhores resultados.
